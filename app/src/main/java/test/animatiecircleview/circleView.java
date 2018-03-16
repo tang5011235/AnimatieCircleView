@@ -16,7 +16,7 @@ import java.util.List;
  * Created by Administrator on 2018/2/24.
  */
 
-public class circleView extends CustomView {
+public class circleView extends CustomView implements CircleAnimate.AnimateHandle {
     private List<ArcDataBean> mArcDataBeans = new ArrayList<>();
     private List<SimpleInfos> mSimpleInfos = new ArrayList<>();
     private float startAngle = -90;
@@ -49,17 +49,29 @@ public class circleView extends CustomView {
         //绘画坐标系
         canvas.save();
         canvas.translate(mViewWidth / 2, mViewHeight / 2);
+        RectF rectF = new RectF(-radius, -radius, radius, radius);
         CanvasAidUtils.set2DAxisLength(500, 700);
         CanvasAidUtils.draw2DCoordinateSpace(canvas);
 
+        if (mCacheArcBeans.size() > 0) {//绘画缓存圆形
+            drawCacheArc(canvas, rectF);
+        }
         drawCircle(canvas);
+    }
+
+    private void drawCacheArc(Canvas canvas, RectF rectF) {
+        for (ArcDataBean cacheArcBean : mCacheArcBeans) {
+            if (cacheArcBean.isDrawed()) {
+                canvas.drawArc(rectF, );
+            }
+        }
     }
 
 
     private void drawCircle(Canvas canvas) {
-        canvas.translate(-radius/2, -radius/2);
+        canvas.translate(-radius / 2, -radius / 2);
         mDeafultPaint.setStrokeWidth(strokeWidth);
-        canvas.drawPoint(0,0, mDeafultPaint);
+        canvas.drawPoint(0, 0, mDeafultPaint);
         if (mArcDataBeans.size() > 0) {
             for (ArcDataBean arcDataBean : mArcDataBeans) {
                 RectF rectF = new RectF(0, 0, radius, radius);
@@ -91,6 +103,26 @@ public class circleView extends CustomView {
             mArcDataBeans.add(arcDataBean);
         }
 
+        buildAnimate(mArcDataBeans);
+    }
+
+    private void buildAnimate(List<ArcDataBean> arcDataBeans) {
+        CircleAnimate circleAnimate = new CircleAnimate(arcDataBeans);
+        circleAnimate.setAnimateHandle(this);
+        circleAnimate.start();
+    }
+
+    private List<ArcDataBean> mCacheArcBeans;//已经绘画过的圆弧
+
+    /**
+     * 1.将即将绘画的圆弧对象起来
+     *
+     * @param angle
+     * @param arcDataBean
+     */
+    @Override
+    public void onAnimateProcessing(float angle, ArcDataBean arcDataBean) {
+        mCacheArcBeans.add(arcDataBean);
         invalidate();
     }
 }
