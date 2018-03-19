@@ -9,12 +9,16 @@ public class ArcDataBean {
     private float endAngle;
     private float sweppAngle;
     private int color;
-    private float RestOfAngle;
+    private float restOfAngle;
     private boolean isDrawed;
+    private float drawedAngle;
 
+    public float getDrawedAngle() {
+        return drawedAngle;
+    }
 
     public float getRestOfAngle() {
-        return RestOfAngle;
+        return restOfAngle;
     }
 
     public boolean isDrawed() {
@@ -57,10 +61,11 @@ public class ArcDataBean {
 
         if (this.startAngle < startAngle) {
             isDrawed = true;
+            drawedAngle = startAngle - this.startAngle;
         }
 
         if (this.startAngle <= startAngle && startAngle <= endAngle) {
-            RestOfAngle = endAngle - startAngle;
+            restOfAngle = endAngle - startAngle;
             return true;
         }
         return false;
